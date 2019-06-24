@@ -1,0 +1,26 @@
+{
+  "name": "Denislav-Zotev-employees",
+  "version": "1.0.0",
+  "description": "# start program",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "formidable": "^1.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/denislav95/Denislav-Zotev-employees.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/denislav95/Denislav-Zotev-employees/issues"
+  },
+  "homepage": "https://github.com/denislav95/Denislav-Zotev-employees#readme"
+}
