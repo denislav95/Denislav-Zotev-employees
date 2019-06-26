@@ -121,10 +121,10 @@ class Upload extends Component {
       return (
         <button
           onClick={() =>
-            this.setState({ files: [], successfullUploaded: false, error: '', employeesData: null })
-          }
+              window.location.reload()
+         }
         >
-          Clear
+          New file
         </button>
       );
     } else {

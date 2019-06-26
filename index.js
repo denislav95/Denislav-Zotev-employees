@@ -41,9 +41,13 @@ if (args.includes('console')) {
             let projects = buildProjects(resp);
             let filteredProjects = filterProjects(projects);
             let result = findLongestPeriod(filteredProjects);
-            console.log(result);
+            if (result) {
+                console.log(result);
+            } else {
+                console.log('Not enough data!')
+            }
         } else {
-            console.log('Empty file!');
+            console.log('Empty file or not enough data!');
         }
 
     });
@@ -53,32 +57,47 @@ if (args.includes('console')) {
     });
 }
 
+/*
+* Find the longest period by comparing the first two employees period with the rest
+*/
 function findLongestPeriod(filteredProjects) {
-    let firstProject = filteredProjects.values().next().value;
-    let longestPeriod = {
-        employees: [firstProject[0].empID, firstProject[1].empID],
-        period: firstProject[0].period + firstProject[1].period
-    };
+    let projects = filteredProjects.values().next().value;
+    let longestPeriod = null;
 
-    filteredProjects.forEach((value, key) => {
-        let project = filteredProjects.get(key);
-        let tempPeriod = project[0].period + project[1].period;
-        if(tempPeriod > longestPeriod.period) {
-            const daysWorked = getDaysWorked(project[0].dateFrom, project[0].dateTo) + getDaysWorked(project[1].dateFrom, project[1].dateTo);
-            longestPeriod = {
-                employees: [project[0].empID, project[1].empID],
-                project: project[0].projectID,
-                days: daysWorked
+    if (projects) {
+        let daysWorked = getDaysWorked(projects[0].dateFrom, projects[0].dateTo) + getDaysWorked(projects[1].dateFrom, projects[1].dateTo);
+        longestPeriod = {
+            employees: [projects[0].empID, projects[1].empID],
+            project: projects[0].projectID,
+            days: daysWorked
+        };
+
+        const firstTwoPeriods = projects[0].period + projects[1].period;
+
+        filteredProjects.forEach((value, key) => {
+            let project = filteredProjects.get(key);
+            let tempPeriod = project[0].period + project[1].period;
+
+            if(tempPeriod > firstTwoPeriods) {
+                daysWorked = getDaysWorked(project[0].dateFrom, project[0].dateTo) + getDaysWorked(project[1].dateFrom, project[1].dateTo);
+                longestPeriod = {
+                    employees: [project[0].empID, project[1].empID],
+                    project: project[0].projectID,
+                    days: daysWorked
+                }
             }
-        }
-    });
+        });
+    }
 
     return longestPeriod;
 }
 
-
+/*
+* Filter projects by projectID and sort by period descending
+*/
 function filterProjects(projects) {
     let projectsWithMoreEmployees = new Map();
+
     projects.forEach((value, key) => {
         if(Array.isArray(projects.get(key))) {
             let period = 0;
@@ -97,6 +116,9 @@ function filterProjects(projects) {
     return projectsWithMoreEmployees;
 }
 
+/*
+* Return all projects in a map with the necessary params employeeID, projectID, dateFrom, dateTo
+*/
 function buildProjects(resp) {
     let projects = new Map();
     resp.forEach(employee => {
@@ -125,11 +147,18 @@ function buildProjects(resp) {
     return projects;
 }
 
+
+/*
+* Calculate total days worked
+*/
 function getDaysWorked(from, to) {
     const timeDiff  = to - from;
     return Math.round(timeDiff / (1000 * 60 * 60 * 24));
 }
 
+/*
+* Sort employees data descending by period
+*/
 function compare( a, b ) {
     if ( a.period > b.period ){
         return -1;
@@ -140,10 +169,17 @@ function compare( a, b ) {
     return 0;
 }
 
+/*
+* Check if given date is a valid date
+*/
 function isValidDate(d) {
     return d instanceof Date && !isNaN(d);
 }
 
+
+/*
+* Promise to return the file data
+*/
 async function readTextFile(file) {
     let rows = [];
     const fileStream = fs.createReadStream(file || './data.txt');
